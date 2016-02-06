@@ -1,2 +1,2 @@
 # PDFImagesOCR
-A Python program that uses tesseract to convert PDFs into text or searchable PDFs.
+A Python program for converting PDFs into text or searchable PDFs.
