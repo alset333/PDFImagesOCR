@@ -11,7 +11,7 @@ __version__ = "0.1.0"
 
 
 
-##################################  PREPARATIONS BEGIN  ##########################################
+##################################  PREPARATIONS BEGIN  ###############################################################
 
 # Print help text if needed
 if (len(sys.argv) != 3 and len(sys.argv) != 4) or 'help' in sys.argv or '-h' in sys.argv or '/?' in sys.argv or '--help' in sys.argv:
@@ -37,7 +37,7 @@ EXAMPLE
         Unix (Mac/Linux):
             "./PDFImagesOCR.py file.pdf txt"
         Windows:
-            (untested so far)           
+            (untested so far)
 
 DESCRIPTION
     Converts images from a PDF into a text file or a searchable PDF.
@@ -83,21 +83,21 @@ os.mkdir(tempPath)
 if DEBUGMODE:
     print('In: ' + inFilePath + '\n' + 'Out: ' + outFilePath + '\n' + 'Temp: ' + tempPath + '\n\n')
 
-###################################  PREPARATIONS END  ###########################################
+###################################  PREPARATIONS END  ################################################################
 
 
 
 
 def pdfToImages(ifp, tp):
-    """Takes a PDF from the input filepath (ifp), and converts it into images as 'pg-*.jpg' in the temporary path (tp). Returns the number of pages."""
+    """Takes a PDF from the input-file-path (ifp), and converts it into images as 'pg-*.jpg' in the temporary path (tp). Returns the number of pages."""
     print("Converting PDF into images...")
     os.system('convert -density 300 "' + ifp + '" "' + os.path.normpath(tp + '/pg.jpg') + '"')
     files = os.listdir(tp)
     if '.DS_Store' in files:
         files.remove('.DS_Store')
-    pageCount = len(files) # The number of pages is the number of files
+    pgCount = len(files) # The number of pages is the number of files
     print("PDF Converted.")
-    return pageCount
+    return pgCount
 
 def imagesToTxt(pgCount, tp, ofp):
     """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a txt file (ofp)"""
@@ -109,7 +109,6 @@ def imagesToTxt(pgCount, tp, ofp):
         os.system('tesseract "' + imagePath + '" stdout >> "' + ofp + '"')
     print("All pages read.")
     
-
 
 
 
