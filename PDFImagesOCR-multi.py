@@ -101,6 +101,10 @@ os.mkdir(tempPath)
 if DEBUGMODE:
     print('In: ' + inFilePath + '\n' + 'Out: ' + outFilePath + '\n' + 'Temp: ' + tempPath + '\n\n')
 
+yn = input("Proceed? (y/n)\n")
+if yn.lower() != 'y':
+    print("Exiting")
+    exit()
 ###################################  PREPARATIONS END  ###########################################
 
 
