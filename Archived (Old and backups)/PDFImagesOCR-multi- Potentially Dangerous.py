@@ -6,15 +6,14 @@ import os
 import tempfile
 import shutil
 import time
-import subprocess
 
 __author__ = "Peter Maar"
-__version__ = "0.2.0"
+__version__ = "0.1.0"
 
 yn = input("""
 WARNING! THIS PROGRAM IS A EXPERIMENTAL VERSION AND COULD BE DANGEROUS!
 This is the 'multi' version of PDFImagesOCR. This version attempts to process multiple images at once.
-This software has only been tested on Mac OSX Yosemite.
+This software has only been tested on Mac OSX Yosemite, and is not designed for Windows.
 While it is stated in the license, I will reiterate that this software is provided 'as is' and I have no liability for any issues or damage(s) it causes.
 It is recommended you are skilled with Python 3, tesseract, ImageMagick, and OSX, and that you have read the source code of this Python program before using this program.
 If you wish to continue, please enter below 'I wish to continue despite the risks':\n
@@ -26,11 +25,9 @@ else:
     print("Okay, I hope you know what you are doing!")
           
 os.system('pgrep tesseract > "' + sys.path[0] + '/pgrep-tesseract.txt"')
-pgrepResult = open(sys.path[0] + '/pgrep-tesseract.txt', 'r').read()
-if pgrepResult != '':
+if open(sys.path[0] + '/pgrep-tesseract.txt', 'r').read() != '':
     print("Error! A tesseract process is already running. Do not run other programs that use tesseract while using the 'multi' version of PDFImagesOCR.")
     exit()
-os.remove(sys.path[0] + '/pgrep-tesseract.txt')
           
 ##################################  PREPARATIONS BEGIN  ##########################################
 
@@ -95,7 +92,6 @@ outType = sys.argv[2].lower()
 outFilePath = inFilePath[:-4] + "-OCR." + outType
 if os.path.isfile(outFilePath):
     print("Output file already exists!")
-    print(outFilePath)
     exit()
 
 # Get Temporary Location
@@ -104,10 +100,11 @@ os.mkdir(tempPath)
 
 if DEBUGMODE:
     print('In: ' + inFilePath + '\n' + 'Out: ' + outFilePath + '\n' + 'Temp: ' + tempPath + '\n\n')
-    yn = input("Proceed? (y/n)\n")
-    if yn.lower() != 'y':
-        print("Exiting")
-        exit()
+
+yn = input("Proceed? (y/n)\n")
+if yn.lower() != 'y':
+    print("Exiting")
+    exit()
 ###################################  PREPARATIONS END  ###########################################
 
 
@@ -130,8 +127,8 @@ def imagesToTxt(pgCount, tp, ofp):
         imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".jpg")
         print("Reading page", i + 1, "of", str(pgCount) + "...")
         if DEBUGMODE:
-            print("""subprocess.Popen(['tesseract "' + imagePath + '" stdout >> "' + ofp[:-4] + str(i) + '"'], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)""")
-        subprocess.Popen(['tesseract "' + imagePath + '" stdout >> "' + ofp[:-4] + str(i) + '"'], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+            print('tesseract "' + imagePath + '" stdout >> "' + ofp[:-4] + str(i) + '" &')
+        os.system('tesseract "' + imagePath + '" stdout >> "' + ofp[:-4] + str(i) + '" &')
 
     while True:
         os.system('pgrep tesseract > "' + sys.path[0] + '/pgrep-tesseract.txt"')
@@ -142,8 +139,6 @@ def imagesToTxt(pgCount, tp, ofp):
     os.remove(sys.path[0] + '/pgrep-tesseract.txt')
 
     for i in range(pgCount):
-        if DEBUGMODE:
-            print('cat "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
         os.system('cat "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
         os.remove(ofp[:-4] + str(i))
     
