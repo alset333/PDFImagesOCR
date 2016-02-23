@@ -5,7 +5,6 @@ import sys
 import os
 import tempfile
 import shutil
-import time
 import subprocess
 
 __author__ = "Peter Maar"
@@ -24,13 +23,7 @@ if yn != 'I wish to continue despite the risks':
     exit()
 else:
     print("Okay, I hope you know what you are doing!")
-          
-os.system('pgrep tesseract > "' + sys.path[0] + '/pgrep-tesseract.txt"')
-pgrepResult = open(sys.path[0] + '/pgrep-tesseract.txt', 'r').read()
-if pgrepResult != '':
-    print("Error! A tesseract process is already running. Do not run other programs that use tesseract while using the 'multi' version of PDFImagesOCR.")
-    exit()
-os.remove(sys.path[0] + '/pgrep-tesseract.txt')
+
           
 ##################################  PREPARATIONS BEGIN  ##########################################
 
@@ -126,31 +119,33 @@ def pdfToImages(ifp, tp):
 
 def imagesToTxt(pgCount, tp, ofp):
     """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a txt file (ofp)"""
+    procList = []  # List of 'subprocess.Popen's
     for i in range(pgCount): # Starting at 0, and up to (but not including) pgCount - this works since counting pages starts at 1, but the files start at 0.
         imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".jpg")
         print("Reading page", i + 1, "of", str(pgCount) + "...")
         if DEBUGMODE:
             print("""subprocess.Popen(['tesseract "' + imagePath + '" stdout >> "' + ofp[:-4] + str(i) + '"'], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)""")
-        subprocess.Popen(['tesseract "' + imagePath + '" stdout >> "' + ofp[:-4] + str(i) + '"'], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+        proc = subprocess.Popen(['tesseract "' + imagePath + '" stdout >> "' + ofp[:-4] + str(i) + '"'], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+        procList.append(proc)
 
-    while True:
-        os.system('pgrep tesseract > "' + sys.path[0] + '/pgrep-tesseract.txt"')
-        if open(sys.path[0] + '/pgrep-tesseract.txt', 'r').read() == '':
-            break
-        time.sleep(2)
-
-    os.remove(sys.path[0] + '/pgrep-tesseract.txt')
+    for p in procList:  # Waits for all subprocesses to be done.
+        p.wait()  # If the process isn't done yet, the program will stay at this line until it does.
 
     for i in range(pgCount):
+
         if DEBUGMODE:
-            print('cat "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
-        os.system('cat "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
+            if os.name == 'posix': # If Linux or Mac OS X
+                print('cat "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
+            else:  # If Windows #TODO find out if there are other non-posix OSes that we should take into account
+                print('type "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
+
+        if os.name == 'posix':  # If Linux or Mac OS X
+            os.system('cat "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
+        else:  # If Windows #TODO find out if there are other non-posix OSes that we should take into account
+            os.system('type "' + ofp[:-4] + str(i) + '" >> "' + ofp + '"')
         os.remove(ofp[:-4] + str(i))
     
     print("All pages read.")
-    
-
-
 
 
 # Use ImageMagick to turn the pages into images
