@@ -2,6 +2,10 @@
 # PDFImagesOCR.py
 
 import PDFImagesOCRCore
+import sys
+import os
+import tempfile
+import shutil
 try:
     import PyPDF2
 except ImportError:
@@ -11,10 +15,6 @@ except ImportError:
     except ImportError:
         print("You need 'PyPDF2' installed to use this program.")
         exit()
-import sys
-import os
-import tempfile
-import shutil
 
 __author__ = "Peter Maar"
 __version__ = "0.4.0"
