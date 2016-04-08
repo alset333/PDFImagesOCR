@@ -9,7 +9,7 @@ import tempfile
 import shutil
 
 __author__ = "Peter Maar"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 
@@ -20,7 +20,7 @@ def imagesToTxt(pgCount, tp, ofp):
 
     # OCR the images
     for i in range(pgCount): # Starting at 0, and up to (but not including) pgCount - this works since counting pages starts at 1, but the files start at 0.
-        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".jpg")
+        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".png")
         print("Reading page", i + 1, "of", str(pgCount) + "...")
         if DEBUGMODE:
             print('tesseract "' + imagePath + '" "' + ofp + str(i) + '"')
@@ -41,7 +41,7 @@ def imagesToPDF(pgCount, tp, ofp):
     """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a pdf file (ofp)"""
     # OCR the images
     for i in range(pgCount):  # Starting at 0, and up to (but not including) pgCount - this works since counting pages starts at 1, but the files start at 0.
-        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".jpg")
+        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".png")
         print("Reading page", i + 1, "of", str(pgCount) + "...")
         if DEBUGMODE:
             print('tesseract "' + imagePath + '" "' + ofp + str(i) + '" pdf')

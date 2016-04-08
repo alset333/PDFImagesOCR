@@ -1,6 +1,9 @@
 import DependencyHandler
 import os
 
+__author__ = 'Peter Maar'
+__version__ = '0.1.0'
+
 HELPTEXT = """
 
 NAME
@@ -37,7 +40,7 @@ REQUIREMENTS
     Python 3
         PDFImagesOCR is written to be run by Python 3.
     ImageMagick (CLI)
-        ImageMagick is needed to convert the PDF into JPEGs.
+        ImageMagick is needed to convert the PDF into PNGs.
         ImageMagick's convert command must be accessible from the command line as 'convert'.
     Tesseract OCR Engine (CLI)
         The Tesseract OCR Engine is needed for reading text from the images.
@@ -57,9 +60,9 @@ def checkDepend():
         exit()
 
 def pdfToImages(ifp, tp):
-    """Takes a PDF from the input-file-path (ifp), and converts it into images as 'pg-*.jpg' in the temporary path (tp). Returns the number of pages."""
+    """Takes a PDF from the input-file-path (ifp), and converts it into images as 'pg-*.png' in the temporary path (tp). Returns the number of pages."""
     print("Converting PDF into images...")
-    os.system('convert -density 300 "' + ifp + '" "' + os.path.normpath(tp + '/pg.jpg') + '"')
+    os.system('convert -density 300 "' + ifp + '" "' + os.path.normpath(tp + '/pg.png') + '"')
     files = os.listdir(tp)
     if '.DS_Store' in files:
         files.remove('.DS_Store')
