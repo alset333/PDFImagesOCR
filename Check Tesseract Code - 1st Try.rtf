@@ -1,0 +1,56 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Bold;\f2\fnil\fcharset0 Menlo-Regular;
+}
+{\colortbl;\red255\green255\blue255;\red43\green43\blue43;\red204\green120\blue50;\red169\green183\blue198;
+\red0\green128\blue128;\red104\green151\blue187;\red128\green128\blue128;\red136\green136\blue198;\red170\green73\blue38;
+}
+\margl1440\margr1440\vieww11260\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 \cb2 \uc0\u8232 
+\f1\b \cf3 if 
+\f2\b0 \cf4 os.name == \cf5 'posix'\cf4 :\uc0\u8232     code = os.system(\cf5 "tesseract 2>&1 > /dev/null"\cf4 )\uc0\u8232     
+\f1\b \cf3 if 
+\f2\b0 \cf4 code == \cf6 0\cf4 :  \cf7 # Tesseract found\uc0\u8232        \cf8 print\cf4 (\cf5 "Tesseract found."\cf4 )\uc0\u8232        \cf7 tess \cf4 = 
+\f1\b \cf3 True\uc0\u8232     elif 
+\f2\b0 \cf4 code == \cf6 32512\cf4 :  \cf7 # Returned by 'sh' if a command is not found\uc0\u8232         \cf8 print\cf4 (\cf5 "Tesseract OCR 'tesseract' command not found. Attempting to install Tesseract OCR..."\cf4 )\uc0\u8232     installTesseract()\u8232 \u8232 
+\f1\b \cf3 elif 
+\f2\b0 \cf4 os.name == \cf5 'nt'\cf4 :\uc0\u8232     code = os.system(\cf5 "tesseract"\cf4 )\uc0\u8232 \u8232 \u8232 
+\f1\b \cf3 else
+\f2\b0 \cf4 :\uc0\u8232     \cf8 print\cf4 (\cf5 "Unsupported or unknown system."\cf4 )\uc0\u8232     
+\f1\b \cf3 return False\uc0\u8232 \u8232 \u8232 elif 
+\f2\b0 \cf4 code == \cf6 1 
+\f1\b \cf3 and 
+\f2\b0 \cf4 os.name == \cf5 'nt'\cf4 :  \cf7 # Returned in windows if a command is not found (could be confused with other errors though, but either way it's not properly installed)\uc0\u8232     \cf8 print\cf4 (\cf5 "Tesseract OCR doesn't seem to be installed. Attempting to install..."\cf4 )\uc0\u8232     installTesseract()\u8232 
+\f1\b \cf3 else
+\f2\b0 \cf4 :\uc0\u8232     \cf8 print\cf4 (\cf5 "Error while trying to check if Tesseract OCR is installed. Return code and system didn't match any options."\cf4 )\uc0\u8232     \cf8 exit\cf4 ()\uc0\u8232 \u8232 \u8232 code = os.system(\cf5 "convert"\cf4 )\uc0\u8232 
+\f1\b \cf3 if 
+\f2\b0 \cf4 code == \cf6 0\cf4 :  \cf7 # Imagemagick found\uc0\u8232     \cf8 print\cf4 (\cf5 "Imagemagick found."\cf4 )\uc0\u8232     magk = 
+\f1\b \cf3 True\uc0\u8232 elif 
+\f2\b0 \cf4 code == \cf6 32512 
+\f1\b \cf3 and 
+\f2\b0 \cf4 os.name == \cf5 'posix'\cf4 :  \cf7 # Returned by 'sh' if a command is not found\uc0\u8232     \cf8 print\cf4 (\cf5 "Imagemagick 'convert' command not found. Attempting to install Imagemagick..."\cf4 )\uc0\u8232     installImagemagick()\u8232 
+\f1\b \cf3 elif 
+\f2\b0 \cf4 code == \cf6 1 
+\f1\b \cf3 and 
+\f2\b0 \cf4 os.name == \cf5 'nt'\cf4 :  \cf7 # Returned in windows if a command is not found (could be confused with other errors though, but either way it's not properly installed)\uc0\u8232     \cf8 print\cf4 (\cf5 "Imagemagick doesn't seem to be installed. Attempting to install..."\cf4 )\uc0\u8232     installImagemagick()\u8232 
+\f1\b \cf3 else
+\f2\b0 \cf4 :\uc0\u8232     \cf8 print\cf4 (\cf5 "Error while trying to check if Imagemagick is installed. Return code and system didn't match any options."\cf4 )\uc0\u8232     \cf8 exit\cf4 ()\uc0\u8232 \u8232 \u8232 
+\f1\b \cf3 if not 
+\f2\b0 \cf4 tess 
+\f1\b \cf3 or not 
+\f2\b0 \cf4 magk:  \cf7 # On the first run, tryAgain is true, so if it doesn't find them, it tries again to check if the install worked\uc0\u8232     
+\f1\b \cf3 if 
+\f2\b0 \cf4 tryAgain:\uc0\u8232         dependencies(\cf9 tryAgain \cf4 = 
+\f1\b \cf3 False
+\f2\b0 \cf4 )\uc0\u8232     
+\f1\b \cf3 else
+\f2\b0 \cf4 :\uc0\u8232         
+\f1\b \cf3 return False  
+\f2\b0 \cf7 # Already tried once, this second time still didn't work, so return false\uc0\u8232 
+\f1\b \cf3 elif 
+\f2\b0 \cf4 tess 
+\f1\b \cf3 and 
+\f2\b0 \cf4 magk:\uc0\u8232     
+\f1\b \cf3 return True\
+}
