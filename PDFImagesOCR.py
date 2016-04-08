@@ -1,14 +1,36 @@
 #!/usr/bin/env python3
 # PDFImagesOCR.py
 
+import DependencyHandler
 import sys
 import os
 import tempfile
 import shutil
 
 __author__ = "Peter Maar"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
+
+def pdfToImages(ifp, tp):
+    """Takes a PDF from the input-file-path (ifp), and converts it into images as 'pg-*.jpg' in the temporary path (tp). Returns the number of pages."""
+    print("Converting PDF into images...")
+    os.system('convert -density 300 "' + ifp + '" "' + os.path.normpath(tp + '/pg.jpg') + '"')
+    files = os.listdir(tp)
+    if '.DS_Store' in files:
+        files.remove('.DS_Store')
+    pgCount = len(files) # The number of pages is the number of files
+    print("PDF Converted.")
+    return pgCount
+
+def imagesToTxt(pgCount, tp, ofp):
+    """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a txt file (ofp)"""
+    for i in range(pgCount): # Starting at 0, and up to (but not including) pgCount - this works since counting pages starts at 1, but the files start at 0.
+        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".jpg")
+        print("Reading page", i + 1, "of", str(pgCount) + "...")
+        if DEBUGMODE:
+            print('tesseract "' + imagePath + '" stdout >> "' + ofp + '"')
+        os.system('tesseract "' + imagePath + '" stdout >> "' + ofp + '"')
+    print("All pages read.")
 
 
 ##################################  PREPARATIONS BEGIN  ###############################################################
@@ -63,6 +85,14 @@ REQUIREMENTS
 # Check if the program should run in debug mode
 DEBUGMODE = 'DEBUG' in sys.argv
 
+# Check dependencies
+print("Checking dependencies...")
+if DependencyHandler.dependencies():
+    print("Dependencies seem good! Proceeding.")
+else:
+    print("Dependencies not detected or not working,\nand could not be installed automatically.\nPlease install and configure them.")
+    exit()
+
 # Get Input File Location
 inFilePath = os.path.normpath(sys.argv[1])
 if not os.path.isfile(inFilePath):
@@ -83,32 +113,13 @@ os.mkdir(tempPath)
 if DEBUGMODE:
     print('In: ' + inFilePath + '\n' + 'Out: ' + outFilePath + '\n' + 'Temp: ' + tempPath + '\n\n')
 
+
+
+
 ###################################  PREPARATIONS END  ################################################################
 
 
 
-
-def pdfToImages(ifp, tp):
-    """Takes a PDF from the input-file-path (ifp), and converts it into images as 'pg-*.jpg' in the temporary path (tp). Returns the number of pages."""
-    print("Converting PDF into images...")
-    os.system('convert -density 300 "' + ifp + '" "' + os.path.normpath(tp + '/pg.jpg') + '"')
-    files = os.listdir(tp)
-    if '.DS_Store' in files:
-        files.remove('.DS_Store')
-    pgCount = len(files) # The number of pages is the number of files
-    print("PDF Converted.")
-    return pgCount
-
-def imagesToTxt(pgCount, tp, ofp):
-    """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a txt file (ofp)"""
-    for i in range(pgCount): # Starting at 0, and up to (but not including) pgCount - this works since counting pages starts at 1, but the files start at 0.
-        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".jpg")
-        print("Reading page", i + 1, "of", str(pgCount) + "...")
-        if DEBUGMODE:
-            print('tesseract "' + imagePath + '" stdout >> "' + ofp + '"')
-        os.system('tesseract "' + imagePath + '" stdout >> "' + ofp + '"')
-    print("All pages read.")
-    
 
 
 
