@@ -6,15 +6,7 @@ import sys
 import os
 import tempfile
 import shutil
-try:
-    import PyPDF2
-except ImportError:
-    os.system('pip3 install PyPDF2')
-    try:
-        import PyPDF2
-    except ImportError:
-        print("You need 'PyPDF2' installed to use this program.")
-        exit()
+
 
 __author__ = "Peter Maar"
 __version__ = "0.4.0"
@@ -101,6 +93,16 @@ outType = sys.argv[2].lower()
 outFilePath = inFilePath[:-4] + "-OCR." + outType
 
 if outType == 'pdf':
+    try:
+        import PyPDF2
+    except ImportError:
+        os.system('pip3 install PyPDF2')
+        try:
+            import PyPDF2
+        except ImportError:
+            print("You need 'PyPDF2' installed to output to PDF from this program. Please install it.")
+            exit()
+
     ynOut = input('Searchable PDF output is still highly experimental. Proceed? (y/n)')
     if ynOut != 'y':
         print("Response did not match 'y', exiting.")
