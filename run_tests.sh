@@ -1,4 +1,8 @@
 #!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Get the location where this script is saved
+cd $DIR  # Run at the location where this script is saved
+
 ./PDFImagesOCR.py
 
 wget https://ia802702.us.archive.org/4/items/newindustrialeng00dave/newindustrialeng00dave_bw.pdf
@@ -6,7 +10,6 @@ wget https://ia802702.us.archive.org/4/items/newindustrialeng00dave/newindustria
 
 rm newindustrialeng00dave_bw.pdf
 cat newindustrialeng00dave_bw-OCR.txt
-sleep 5
 rm newindustrialeng00dave_bw-OCR.txt
 
 echo "Test Complete"
