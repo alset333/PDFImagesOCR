@@ -2,7 +2,15 @@
 # PDFImagesOCR.py
 
 import PDFImagesOCRCore
-import PyPDF2
+try:
+    import PyPDF2
+except ImportError:
+    os.system('pip3 install PyPDF2')
+    try:
+        import PyPDF2
+    except ImportError:
+        print("You need 'PyPDF2' installed to use this program.")
+        exit()
 import sys
 import os
 import tempfile
