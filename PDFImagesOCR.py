@@ -6,53 +6,56 @@ import sys
 import os
 import tempfile
 import shutil
+import time
 
 
 __author__ = "Peter Maar"
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 
 
 ############# METHOD DEFINITIONS START #################
 
-def imagesToTxt(pgCount, tp, ofp):
-    """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a txt file (ofp)"""
+def imagesToTxt(pgCount, tp, offp):
+    """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a txt file (offp)"""
 
     # OCR the images
     for i in range(pgCount): # Starting at 0, and up to (but not including) pgCount - this works since counting pages starts at 1, but the files start at 0.
         imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".png")
         print("Reading page", i + 1, "of", str(pgCount) + "...")
         if DEBUGMODE:
-            print('tesseract "' + imagePath + '" "' + ofp + str(i) + '"')
-        os.system('tesseract "' + imagePath + '" "' + ofp + str(i) + '"')
+            print('tesseract "' + imagePath + '" "' + imagePath + '"')
+        os.system('tesseract "' + imagePath + '" "' + imagePath + '"')
 
     # Combine the output files
-    outfile = open(ofp, 'a')
+    outfile = open(offp, 'a')
     for i in range(pgCount):
-        infile = open(ofp + str(i) + '.txt')
+        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".png")
+        infile = open(imagePath + '.txt')
         outfile.write(infile.read())
         infile.close()
-        os.remove(ofp + str(i) + '.txt') # Delete the file after it's been appended
+        os.remove(imagePath + '.txt') # Delete the file after it's been appended
     outfile.close()
 
     print("All pages read.")
 
-def imagesToPDF(pgCount, tp, ofp):
-    """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a pdf file (ofp)"""
+def imagesToPDF(pgCount, tp, offp):
+    """Takes the temporary path (tp) where pgCount images are stored, and OCRs them into a pdf file (offp)"""
     # OCR the images
     for i in range(pgCount):  # Starting at 0, and up to (but not including) pgCount - this works since counting pages starts at 1, but the files start at 0.
         imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".png")
         print("Reading page", i + 1, "of", str(pgCount) + "...")
         if DEBUGMODE:
-            print('tesseract "' + imagePath + '" "' + ofp + str(i) + '" pdf')
-        os.system('tesseract "' + imagePath + '" "' + ofp + str(i) + '" pdf')
+            print('tesseract "' + imagePath + '" "' + imagePath + '" pdf')
+        os.system('tesseract "' + imagePath + '" "' + imagePath + '" pdf')
 
     # Combine the output files
     merger = PyPDF2.PdfFileMerger()  # New PDF
     for i in range(pgCount):
-        merger.append(ofp + str(i) + '.pdf')
-        os.remove(ofp + str(i) + '.pdf')  # Delete the file after it's been appended
-    merger.write(ofp)
+        imagePath = os.path.normpath(tp + "/pg-" + str(i) + ".png")
+        merger.append(imagePath + '.pdf')
+        os.remove(imagePath + '.pdf')  # Delete the file after it's been appended
+    merger.write(offp)
 
     print("All pages read.")
 
@@ -89,9 +92,12 @@ if not os.path.isfile(inFilePath):
     exit()
     
 # Get Output File Location
-outType = sys.argv[2].lower()
-outFilePath = inFilePath[:-4] + "-OCR." + outType
+outType = sys.argv[2].lower() # 'txt' or 'pdf'
+outFileFullPath = inFilePath[:-4] + "-OCR." + outType # the dir path + the filename
+outFileDir = outFileFullPath[:outFileFullPath.rfind(os.path.normpath('/'))] + os.path.normpath('/') # the output directory
+fileName = outFileFullPath[outFileFullPath.rfind(os.path.normpath('/')) + 1:-8] # the output filename
 
+# Import PyPDF2 if needed.
 if outType == 'pdf':
     try:
         import PyPDF2
@@ -109,21 +115,27 @@ if outType == 'pdf':
         exit()
 
 # Check that the output file doesn't exist
-if os.path.isfile(outFilePath):
+if os.path.isfile(outFileFullPath):
     print("Output file already exists!")
     exit()
 
 # Find & Make Temporary Location
-tempPath = os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-TempFolder")
+if not os.path.isdir(os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-TempFolder")): # If the main temp path isn't there
+    os.mkdir(os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-TempFolder")) # Make it
+
+# Make temp path for this specific instance
+tempPath = os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-TempFolder/" + fileName + '-' + str(time.time())) + os.path.normpath('/') # Add in the starting time to help prevent conflicts if multiple instances are run
 os.mkdir(tempPath)
 
 if DEBUGMODE:
-    print('In: ' + inFilePath + '\n' + 'Out: ' + outFilePath + '\n' + 'Temp: ' + tempPath + '\n\n')
+    print('In: ' + inFilePath + '\n' +
+          'Output File: ' + outFileFullPath + '\n' +
+          'Output Directory: ' + outFileDir + '\n' +
+          'File name: ' + fileName + '\n' +
+          'Temp: ' + tempPath + '\n\n')
 
 
 ###################################  PREPARATIONS END  ################################################################
-
-
 
 
 
@@ -135,9 +147,9 @@ pageCount = PDFImagesOCRCore.pdfToImages(inFilePath, tempPath) # Pagecount is th
 
 
 if outType == 'txt':
-    imagesToTxt(pageCount, tempPath, outFilePath)
+    imagesToTxt(pageCount, tempPath, outFileFullPath)
 elif outType == 'pdf':
-    imagesToPDF(pageCount, tempPath, outFilePath)
+    imagesToPDF(pageCount, tempPath, outFileFullPath)
 else:
     print("Unknown output type!")
 
@@ -146,4 +158,4 @@ if DEBUGMODE:
     print("Removing temporary files")
 shutil.rmtree(tempPath)
 
-print('PDFImagesOCR completed!\nOutput saved as "' + outFilePath + '".')
+print('PDFImagesOCR completed!\nOutput saved as "' + outFileFullPath + '".')
