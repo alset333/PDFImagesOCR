@@ -81,7 +81,7 @@ if PDFImagesOCRCore.shouldPrintHelp(sys.argv):
 DEBUGMODE = 'DEBUG' in sys.argv
 
 # Check dependencies
-PDFImagesOCRCore.checkDepend()
+PDFImagesOCRCore.checkDepend(DEBUGMODE = DEBUGMODE)
 
 # Get Input File Location
 inFilePath = os.path.normpath(sys.argv[1])
@@ -124,7 +124,7 @@ if not os.path.isdir(os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-Tem
     os.mkdir(os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-TempFolder")) # Make it
 
 # Make temp path for this specific instance
-tempPath = os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-TempFolder/" + fileName + '-' + str(time.time())) + os.path.normpath('/') # Add in the starting time to help prevent conflicts if multiple instances are run
+tempPath = os.path.normpath(tempfile.gettempdir() + "/PDFImagesOCR-TempFolder/" + fileName + '-' + str(int(time.time()*1000000000))) + os.path.normpath('/') # Add in the starting time to help prevent conflicts if multiple instances are run
 os.mkdir(tempPath)
 
 if DEBUGMODE:

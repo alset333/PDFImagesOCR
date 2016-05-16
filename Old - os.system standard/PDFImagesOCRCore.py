@@ -44,6 +44,7 @@ REQUIREMENTS
     ImageMagick (CLI)
         ImageMagick is needed to convert the PDF into PNGs.
         ImageMagick's convert command must be accessible from the command line as 'convert'.
+        You might need to also install Ghostscript for it to work properly.
     Tesseract OCR Engine (CLI)
         The Tesseract OCR Engine is needed for reading text from the images.
         It must be accessible from the command line as 'tesseract'.
@@ -53,9 +54,9 @@ REQUIREMENTS
 def shouldPrintHelp(argv):
     return (len(argv) != 3 and len(argv) != 4) or 'help' in argv or '-h' in argv or '/?' in argv or '--help' in argv
 
-def checkDepend():
+def checkDepend(DEBUGMODE = False):
     print("Checking dependencies...")
-    if DependencyHandler.dependencies():
+    if DependencyHandler.dependencies(DEBUGMODE = DEBUGMODE):
         print("Dependencies seem good! Proceeding.")
     else:
         print("Dependencies not detected or not working,\nand could not be installed automatically.\nPlease install and configure them.")
@@ -64,7 +65,7 @@ def checkDepend():
 def pdfToImages(ifp, tp):
     """Takes a PDF from the input-file-path (ifp), and converts it into images as 'pg-*.png' in the temporary path (tp). Returns the number of pages."""
     print("Converting PDF into images...")
-    os.system('convert -density 300 "' + ifp + '" "' + os.path.normpath(tp + '/pg.png') + '"')
+    os.system(DependencyHandler.convertCommand + ' -density 300 "' + ifp + '" "' + os.path.normpath(tp + '/pg.png') + '"')
     files = os.listdir(tp)
     if '.DS_Store' in files:
         files.remove('.DS_Store')
