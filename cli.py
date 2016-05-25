@@ -42,11 +42,12 @@ class Cli:
         inFile = os.path.normpath(args[1])
         outType = args[2]
         core = ocrCore.Ocr(inFile, outType)
-        while core.isRunning():
+        while core.running:
+            print('a', core.running)
             time.sleep(5)
             print(core.currentTask + ': ' + core.fileName)
             core.updateTick()
-        exit()
+            print('b', core.running)
 
 
 def printHelpTextAndExitIfNeeded(args):
