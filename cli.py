@@ -46,6 +46,7 @@ class Cli:
             time.sleep(5)
             print(core.currentTask + ': ' + core.fileName)
             core.updateTick()
+        exit()
 
 
 def printHelpTextAndExitIfNeeded(args):
