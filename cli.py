@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os, sys
 import ocrCore
 import time
 
@@ -48,6 +48,8 @@ class Cli:
             print(core.currentTask + ': ' + core.fileName)
             core.updateTick()
             print('b', core.running)
+        print('sys.exit?')
+        sys.exit()
 
 
 def printHelpTextAndExitIfNeeded(args):
@@ -56,15 +58,15 @@ def printHelpTextAndExitIfNeeded(args):
     if argCount != 3:  # The program, the input file, and the output type
         print("Invalid number of arguments")
         print(helpText)
-        exit()
+        sys.exit()
 
     # If a help argument is given, show help and exit
     for arg in args:
         if arg in helpArgs:
             print(helpText)
-            exit()
+            sys.exit()
 
     if args[2] != 'pdf' and args[2] != 'txt':
         print("Invalid output type: ", args[2])
         print(helpText)
-        exit()
+        sys.exit()
