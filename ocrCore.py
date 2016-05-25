@@ -54,9 +54,12 @@ class Ocr:
             self.currentTask = 'finishing'
 
         elif self.currentTask == 'finishing':
+            print(self.tempSubfolder)
             shutil.rmtree(self.tempSubfolder)
+            print('fin')
             self.currentTask = 'finished'  # Currently the 'finished' value isn't used, but it shows the intent better
             self.running = False
+            print('not running')
 
     def startConvert(self):
         outImgsPath = os.path.normpath(self.tempSubfolder + '/pg.png')  # Will save as 'pg-*.png'
