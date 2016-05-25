@@ -43,14 +43,14 @@ class Cli:
         outType = args[2]
         core = ocrCore.Ocr(inFile, outType)
         while core.running:
-            print('a', core.running)
+            print('a', core.running)  # For Codeship debugging
             time.sleep(5)
             print(core.currentTask + ': ' + core.fileName)
             core.updateTick()
-            print('b', core.running)
-        os.system('cat test.pdf-OCR.txt')
-        print('sys.exit?')
-        sys.exit()
+            print('b', core.running)  # For Codeship debugging
+        os.system('cat test.pdf-OCR.txt')  # For Codeship debugging
+        print('sys.exit?')  # For Codeship debugging
+        sys.exit()  # For Codeship debugging
 
 
 def printHelpTextAndExitIfNeeded(args):
