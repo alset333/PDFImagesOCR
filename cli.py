@@ -48,6 +48,7 @@ class Cli:
             print(core.currentTask + ': ' + core.fileName)
             core.updateTick()
             print('b', core.running)
+        os.system('cat test.pdf-OCR.txt')
         print('sys.exit?')
         sys.exit()
 
