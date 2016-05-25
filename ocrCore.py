@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import os, sys, tempfile, shutil
+import os, tempfile, shutil
+import time
 import subprocess
 import PyPDF2
 
@@ -17,7 +18,7 @@ class Ocr:
         self.running = True
         self.tessSubProcesses = []
         self.cnvrtSbProc = None
-        self.tempSubfolder = os.path.normpath(tempfile.gettempdir() + '/PDFImagesOCR-TempFolder-' + filename[filename.rfind(os.path.normpath('/')) + 1:-4])
+        self.tempSubfolder = os.path.normpath(tempfile.gettempdir() + '/PDFImagesOCR-TempFolder-' + str(time.time()) + filename[filename.rfind(os.path.normpath('/')) + 1:-4])  # time.time() helps for if two filenames are the same
         self.pgCount = 0  # Not known yet, will be set later.
 
         self.currentTask = 'startConvert'  # Start with starting the conversion of the PDF to PNGs
@@ -26,8 +27,6 @@ class Ocr:
             print('ocrCore.Ocr\t\t', filename)
 
         os.mkdir(self.tempSubfolder)
-
-        #
 
     def updateTick(self):
         if self.currentTask == 'startConvert':
@@ -87,6 +86,7 @@ class Ocr:
                 break
         return done
 
+
 def combinePdfs(pCount, tempPath, outPath):
     if pCount == 1:
         os.rename(os.path.normpath(tempPath + '/pg.png.pdf'), outPath)
@@ -97,6 +97,7 @@ def combinePdfs(pCount, tempPath, outPath):
             merger.append(pdfPath)
             os.remove(pdfPath)  # Delete the file after it's been appended
         merger.write(outPath)
+
 
 def combineTxts(pCount, tempPath, outPath):
     if pCount == 1:
@@ -117,40 +118,3 @@ def getImageCount(folder):
         files.remove('.DS_Store')
     pgCount = len(files)  # The number of pages is the number of files
     return pgCount
-
-
-
-'''
-
-
-    def processFile(self):
-        self.pgCount = pdfToImages(self.fileName, self.tempSubfolder)
-        self.ocrImages()
-
-    def ocrImages(self):
-        for i in range(self.pgCount):
-            imageLoc = os.path.normpath(self.tempSubfolder + '/pg-' + str(i) + '.png')
-            subProc = subprocess.Popen(['tesseract "' + imageLoc + '" "' + imageLoc + '" ' + self.outType], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-            self.tessSubProcesses.append(subProc)
-
-    def updateRunningStatus(self):
-        """To be called by the gui on 'tick' or update, otherwise, if we just used a loop with .wait()s,
-        the whole program would get stuck on one ocrCore. This method checks what is running, starts the next
-        step of the process if needed, and sets the 'running' variable to False when everything is done."""
-
-
-        newRunningStatus = False
-        for subProc in self.tessSubProcesses:
-            if subProc.poll() is None:
-                newRunningStatus = True
-                break
-        self.running = newRunningStatus
-
-
-
-
-def pdfToImages(inPdfPath, outDir):
-    outImgsPath = os.path.normpath(outDir + '/pg.png') # Will save as 'pg-*.png'
-    os.system('convert -density 300 "' + inPdfPath + '" "' + outImgsPath + '"')
-    return getImageCount(outDir)
-'''

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from tkinter.filedialog import *
+import platform
 import ocrCore
 
 __author__ = 'Peter Maar'
@@ -12,6 +13,7 @@ DEBUGMODE = False
 class Gui:
     def __init__(self):
         self.root = Tk()  # Tk object
+        self.root.title("PDFImagesOCR")
         self.qdFlnms = []  # 'Queued' filenames
         self.ocrCores = []  # Objects for the files being processed
         self.outtype = 'pdf'
@@ -45,7 +47,11 @@ class Gui:
         self.updateAndCheckAll()  # Call the first time -- it will use '.after' to
         #                           call itself automatically after the first call
 
+        if platform.system() == 'Darwin':
+            os.system("""sleep 0.5 && osascript -e 'tell app "Python" to activate' &""")  # Seems to get stuck forever for some reason, but doesn't seem to be running? either way '&' isn't a good solution but it seems to be the easiest by far
+
         self.root.mainloop()
+
 
     def toggleOutType(self):
         if self.outtype_stringvar.get() == 'Output as PDF (currently txt)':

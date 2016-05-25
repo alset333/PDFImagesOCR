@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
+import sys
 import gui
+import cli
 
 __author__ = 'Peter Maar'
-__version__ = '0.6.0'  # Full rewrite from version 0.5.0 to 0.6.0
+__version__ = '0.7.0'  # Added CLI. There is now a GUI _and_ a CLI.
 
-
-g = gui.Gui()
+if len(sys.argv) == 1:  # If the only argument is the file, run the GUI
+    g = gui.Gui()
+else:                   # If there are other arguments, run the CLI with them
+    c = cli.Cli(sys.argv)
