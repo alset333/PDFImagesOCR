@@ -42,7 +42,7 @@ class Cli:
         inFile = os.path.normpath(args[1])
         outType = args[2]
         core = ocrCore.Ocr(inFile, outType)
-        while core.running:
+        while core.isRunning():
             time.sleep(5)
             print(core.currentTask + ': ' + core.fileName)
             core.updateTick()

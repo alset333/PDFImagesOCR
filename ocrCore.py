@@ -61,6 +61,9 @@ class Ocr:
             self.running = False
             print('not running')
 
+    def isRunning(self):
+        return self.running
+
     def startConvert(self):
         outImgsPath = os.path.normpath(self.tempSubfolder + '/pg.png')  # Will save as 'pg-*.png'
         self.cnvrtSbProc = subprocess.Popen(['convert -density 300 "' + self.fileName + '" "' + outImgsPath + '"'],
