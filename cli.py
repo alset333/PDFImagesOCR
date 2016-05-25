@@ -2,6 +2,7 @@
 
 import os
 import ocrCore
+import time
 
 __author__ = 'Peter Maar'
 __version__ = '0.1.0'  # First separate CLI
@@ -42,6 +43,8 @@ class Cli:
         outType = args[2]
         core = ocrCore.Ocr(inFile, outType)
         while core.running:
+            time.sleep(5)
+            print(core.currentTask + ': ' + core.fileName)
             core.updateTick()
 
 
