@@ -26,7 +26,7 @@ class Gui:
         self.mainCanvas.pack()
 
         # Buttons
-        self.exitButton = Button(self.buttonCanvas, text='Exit', command=exit)
+        self.exitButton = Button(self.buttonCanvas, text='Exit', command=self.cleanExit)
         self.exitButton.pack()
 
         self.openFilesButton = Button(self.buttonCanvas, text='Open/Add Files', command=self.openFiles)
@@ -51,6 +51,22 @@ class Gui:
             os.system("""sleep 0.5 && osascript -e 'tell app "Python" to activate' &""")  # Seems to get stuck forever for some reason, but doesn't seem to be running? either way '&' isn't a good solution but it seems to be the easiest by far
 
         self.root.mainloop()
+
+    def cleanExit(self):
+        for core in self.ocrCores:
+            core.updateTick()
+            if core.currentTask == 'converting':
+                core.cnvrtSbProc.kill()  # Stop the conversion if it's running
+            elif core.currentTask == 'recognising':
+                core.queuedTessSubProcesses = []  # Remove all queued tesseract subprocesses so no new ones start
+                for tessSubProcess in core.tessSubProcesses:
+                    tessSubProcess.kill()
+                    core.tessSubProcesses.remove(tessSubProcess)
+            core.currentTask = 'finishing'  # Let it remove the folders etc
+            core.updateTick()  # Trigger an update to actually remove the folders etc
+            while core.running: None  # Wait for it to finish
+
+        exit()
 
 
     def toggleOutType(self):

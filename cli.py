@@ -28,7 +28,6 @@ OPTIONS
         The type of output to produce.
         'pdf' for a searchable PDF
         'txt' for a text file
-
 """
 
 helpArgs = ['help', 'HELP', '-h', '/h', '-?', '/?', '--help']
@@ -42,16 +41,34 @@ class Cli:
         inFile = os.path.normpath(args[1])
         outType = args[2]
         core = ocrCore.Ocr(inFile, outType)
-        while core.running:
-            print('a', core.running)  # For Codeship debugging
-            time.sleep(5)
-            print(core.currentTask + ': ' + core.fileName)
-            core.updateTick()
-            print('b', core.running)  # For Codeship debugging
+        try:
+            while core.running:
+                print('a', core.running)  # For Codeship debugging
+                time.sleep(5)
+                print(core.currentTask + ': ' + core.fileName)
+                core.updateTick()
+                print('b', core.running)  # For Codeship debugging
+        except KeyboardInterrupt:
+            self.cleanExit(core)
         os.system('cat test.pdf-OCR.txt')  # For Codeship debugging
         print('sys.exit?')  # For Codeship debugging
         sys.exit()  # For Codeship debugging
 
+    def cleanExit(self, core):
+        print('\nExiting...')
+        core.updateTick()
+        if core.currentTask == 'converting':
+            core.cnvrtSbProc.kill()  # Stop the conversion if it's running
+        elif core.currentTask == 'recognising':
+            core.queuedTessSubProcesses = []  # Remove all queued tesseract subprocesses so no new ones start
+            for tessSubProcess in core.tessSubProcesses:
+                tessSubProcess.kill()
+                core.tessSubProcesses.remove(tessSubProcess)
+        core.currentTask = 'finishing'  # Let it remove the folders etc
+        core.updateTick()  # Trigger an update to actually remove the folders etc
+        while core.running: None  # Wait for it to finish
+
+        exit()
 
 def printHelpTextAndExitIfNeeded(args):
     # If the wrong number of args are given, show help and exit
