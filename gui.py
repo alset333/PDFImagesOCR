@@ -11,7 +11,8 @@ DEBUGMODE = False
 
 
 class Gui:
-    def __init__(self):
+    def __init__(self, reason=None):
+        """The GUI. If sent an error 'reason', it will display the reason and not load anything else."""
         self.root = Tk()  # Tk object
         self.root.title("PDFImagesOCR")
         self.qdFlnms = []  # 'Queued' filenames
@@ -28,6 +29,11 @@ class Gui:
         # Buttons
         self.exitButton = Button(self.buttonCanvas, text='Exit', command=self.cleanExit)
         self.exitButton.pack()
+
+        if reason is not None:  # If it was sent a reason, something is wrong with the dependencies
+            self.reasonLabel = Label(self.mainCanvas, text=reason)
+            self.reasonLabel.pack()
+            self.root.mainloop()  # Start the mainloop. The window will open, and none of the following code will run
 
         self.openFilesButton = Button(self.buttonCanvas, text='Open/Add Files', command=self.openFiles)
         self.openFilesButton.pack()

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import os, sys
-import ocrCore
 import time
+import ocrCore
 
 __author__ = 'Peter Maar'
 __version__ = '0.1.0'  # First separate CLI

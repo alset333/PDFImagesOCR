@@ -3,6 +3,7 @@
 import os, tempfile, shutil
 import time
 import subprocess, multiprocessing
+import PyPDF2
 
 __author__ = 'Peter Maar'
 __version__ = '0.1.0'
@@ -100,7 +101,6 @@ class Ocr:
 
 
 def combinePdfs(pCount, tempPath, outPath):
-    import PyPDF2
     if pCount == 1:
         os.rename(os.path.normpath(tempPath + '/pg.png.pdf'), outPath)
     else:
