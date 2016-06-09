@@ -43,24 +43,39 @@ class dCheckr:
         return self.pypdf2_is_Ok and self.imagemagick_is_Ok and self.tesseract_is_Ok
 
 
-def ppf2_Ok():
+def ppf2_Ok(tryInstall=True):
     try:
         import PyPDF2
         return True
     except Exception as e:
         if DEBUGMODE:
             print(e)
-        return False
+        if tryInstall:
+            print("PyPDF2 is not installed. This may be a simple fix using PIP.\nAttempting to install PyPDF2, please wait a moment...")
+            os.system('pip3 install PyPDF2')
+            return ppf2_Ok(tryInstall=False)
+        else:
+            return False
 
 
 def imgmgk_Ok():
+    code   = None
+    mCode  = None
+    mcCode = None
+
     if platform.system() == 'Windows':
-        code = os.system('convert > NUL 2>&1')
+        mCode  = os.system('magick > NUL 2>&1')
+        mcCode = os.system('magick convert > NUL 2>&1')
     else:
         code = os.system('convert > /dev/null 2>&1')
 
-    # Success is 256
-    return code == 256
+    if code == 256:  # Mac returns 256 if the command exists
+        return True
+    elif mCode == 0 and mcCode == 1:  # Windows returns 0 if the command 'magick' exists, and returns 1 if 'magick ___' exists, where ___ is a command
+        return True
+
+    # Success is 256 on Mac, and 0 on Windows
+    return code == 256 or code == 0
 
 
 def tess_Ok():
@@ -69,5 +84,17 @@ def tess_Ok():
     else:
         code = os.system('tesseract > /dev/null 2>&1')
 
-    # Success is 256
-    return code == 256
+    # Success is 256 on Mac, and 0 on Windows
+    return code == 256 or code == 0
+
+if __name__ == '__main__':
+    d = dCheckr()
+    d.check()
+
+    ok = d.dpndOk()
+    print('Dependencies are Ok?', ok)
+
+    r = d.reason
+    print("\nReason:\n-----")
+    print(r)
+    print('-----')

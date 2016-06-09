@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import os, tempfile, shutil
+import os, tempfile, shutil, platform
 import time
 import subprocess, multiprocessing
-import PyPDF2
 
 __author__ = 'Peter Maar'
-__version__ = '0.1.0'
+__version__ = '0.2.0'  # Doesn't let the user OCR a file again. Also, Windows support now included, but as a WIP -- Warning: Rather buggy. Does not work nearly as well as on Mac/Linux/Unix/Posix/etc.
 
 DEBUGMODE = False
 
@@ -31,6 +30,12 @@ class Ocr:
 
         if DEBUGMODE:
             print('ocrCore.Ocr\t\t', filename)
+
+        outPdfExists = os.path.isfile(self.fileName + '-OCR.pdf') and self.outType == 'pdf'
+        outTxtExists = os.path.isfile(self.fileName + '-OCR.txt') and self.outType == 'txt'
+
+        if outPdfExists or outTxtExists or self.fileName.endswith('-OCR.pdf') or self.fileName.endswith('-OCR.txt'):
+            self.currentTask = 'alreadyConvertedAlert'
 
         os.mkdir(self.tempSubfolder)
 
@@ -65,9 +70,21 @@ class Ocr:
             self.currentTask = 'finished'  # Currently the 'finished' value isn't used, but it shows the intent better
             self.running = False
 
+        elif self.currentTask == 'alreadyConvertedAlert':  # This makes it cycle through an extra updateTick, ensuring that the 'alreadyConverted' message is displayed
+            self.currentTask = 'alreadyConverted'
+
+        elif self.currentTask == 'alreadyConverted':
+            self.currentTask = 'finishing'
+
     def startConvert(self):
         outImgsPath = os.path.normpath(self.tempSubfolder + '/pg.png')  # Will save as 'pg-*.png'
-        self.cnvrtSbProc = subprocess.Popen(['convert -density 300 "' + self.fileName + '" "' + outImgsPath + '"'],
+
+        if platform.system() == 'Windows':
+            convert = 'magick convert'
+        else:
+            convert = 'convert'
+
+        self.cnvrtSbProc = subprocess.Popen([convert + ' -density 300 "' + self.fileName + '" "' + outImgsPath + '"'],
                                             shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
         self.pgCount = getImageCount(self.tempSubfolder)
 
@@ -101,6 +118,8 @@ class Ocr:
 
 
 def combinePdfs(pCount, tempPath, outPath):
+    import PyPDF2  # Only import if needed -- the dependency check doesn't stop this file from being imported,
+                    # so prevent PyPDF2 from running unless it passes the check and continues to here
     if pCount == 1:
         os.rename(os.path.normpath(tempPath + '/pg.png.pdf'), outPath)
     else:

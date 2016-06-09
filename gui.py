@@ -13,6 +13,9 @@ DEBUGMODE = False
 class Gui:
     def __init__(self, reason=None):
         """The GUI. If sent an error 'reason', it will display the reason and not load anything else."""
+        if platform.system() == 'Darwin':
+            os.system("""sleep 1 && osascript -e 'tell app "Python" to activate' &""")  # Seems to get stuck forever for some reason, but doesn't seem to be running? either way '&' isn't a good solution but it seems to be the easiest by far
+
         self.root = Tk()  # Tk object
         self.root.title("PDFImagesOCR")
         self.qdFlnms = []  # 'Queued' filenames
@@ -53,8 +56,6 @@ class Gui:
         self.updateAndCheckAll()  # Call the first time -- it will use '.after' to
         #                           call itself automatically after the first call
 
-        if platform.system() == 'Darwin':
-            os.system("""sleep 0.5 && osascript -e 'tell app "Python" to activate' &""")  # Seems to get stuck forever for some reason, but doesn't seem to be running? either way '&' isn't a good solution but it seems to be the easiest by far
 
         self.root.mainloop()
 
